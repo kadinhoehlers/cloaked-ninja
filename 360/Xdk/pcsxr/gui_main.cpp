@@ -171,6 +171,11 @@ static void DoPcsx(char * game) {
 
 	SysPrintf("Execute\r\n");
 	
+	memset(&psxRegs, 0, sizeof(psxRegs));
+
+	// Start in bootstrap (only work with .cue)
+	psxRegs.pc = 0xbfc00000; 
+
 	//psxExecuteBios();
 	psxCpu->Execute();
 }

@@ -1119,12 +1119,7 @@ static long CALLBACK ISOopen(void) {
 			isMode1ISO = TRUE;
 		}
 	}
-	fseek(cdHandle, 0, SEEK_SET);
-	if(1) {
-		unsigned int n;
-		fread(&n, 4, 1, cdHandle);
-		fseek(cdHandle, 0, SEEK_SET);
-	}
+	
 	SysPrintf(".\n");
 
 	PrintTracks();
@@ -1137,6 +1132,12 @@ static long CALLBACK ISOopen(void) {
 	// make sure we have another handle open for cdda
 	if (numtracks > 1 && ti[1].handle == NULL) {
 		ti[1].handle = fopen(GetIsoFile(), "rb");
+	}
+
+	// if we have a bin only file
+	if (numtracks == 0 && ti[1].handle == NULL && cdHandle) {
+		ti[1].handle = cdHandle;
+		ti[1].type = DATA;
 	}
 
 	return 0;
@@ -1324,6 +1325,8 @@ static long CALLBACK ISOgetStatus(struct CdrStat *stat) {
 	// relative -> absolute time
 	sect = cddaCurPos;
 	sec2msf(sect, (u8 *)stat->Time);
+
+	printf("ISOgetStatus :%d - %d\n", stat->Type, stat->Status);
 	
 	return 0;
 }
